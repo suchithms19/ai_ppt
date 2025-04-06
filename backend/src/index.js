@@ -1,44 +1,38 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import FirecrawlApp from '@mendable/firecrawl-js';
+import alaiService from './services/alai.service.js';
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Initialize Firecrawl
-const firecrawl = new FirecrawlApp({
-  apiKey: process.env.FIRECRAWL_API_KEY
-});
-
-// Default prompt for website scraping
-const DEFAULT_PROMPT = "Extract key information about the company/product including main features, benefits, pricing, and any other relevant details that would be useful for creating a presentation.";
-
-// Scraping endpoint
-app.post('/api/scrape', async (req, res) => {
+app.post('/api/create-presentation', async (req, res) => {
   try {
-    const { url, prompt = DEFAULT_PROMPT } = req.body;
+    const { url, prompt, presentationTitle } = req.body;
 
     if (!url) {
       return res.status(400).json({ error: 'URL is required' });
     }
 
-    const scrapeResult = await firecrawl.extract([url], {
-      prompt: prompt,
-      enableWebSearch: true
+    // Step 1: Scrape the website
+    const scrapedData = await firecrawlService.scrapeWebsite(url, prompt);
+
+    // Step 2: Create the presentation
+    const presentationData = await alaiService.createPresentation(presentationTitle);
+
+    res.json({
+      success: true,
+      scrapedData,
+      presentation: {
+        id: alaiService.getPresentationId(),
+        slideId: alaiService.getSlideId(),
+      }
     });
-
-    if (!scrapeResult.success) {
-      return res.status(500).json({ error: `Failed to scrape: ${scrapeResult.error}` });
-    }
-
-    res.json({ success: true, data: scrapeResult.data });
   } catch (error) {
-    console.error('Scraping error:', error);
+    console.error('Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
