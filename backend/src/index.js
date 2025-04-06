@@ -1,7 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import firecrawlService from './services/firecrawl.service.js';
 import alaiService from './services/alai.service.js';
+import alaiWebSocketService from './services/alai-websocket.service.js';
 
 dotenv.config();
 
@@ -21,15 +23,17 @@ app.post('/api/create-presentation', async (req, res) => {
     const scrapedData = await firecrawlService.scrapeWebsite(url, prompt);
 
     // Step 2: Create the presentation
-    const presentationData = await alaiService.createPresentation(presentationTitle);
+    await alaiService.createPresentation(presentationTitle);
+
+    // Step 3: Generate slide variants using WebSocket
+    await alaiWebSocketService.createSlideVariants(
+      alaiService.getPresentationId(),
+      alaiService.getSlideId(),
+      scrapedData
+    );
 
     res.json({
-      success: true,
-      scrapedData,
-      presentation: {
-        id: alaiService.getPresentationId(),
-        slideId: alaiService.getSlideId(),
-      }
+      finalUrl: `https://app.getalai.com/presentation/${alaiService.getPresentationId()}`
     });
   } catch (error) {
     console.error('Error:', error);

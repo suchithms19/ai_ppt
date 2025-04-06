@@ -14,7 +14,8 @@
     "dotenv": "^16.3.1",
     "cors": "^2.8.5",
     "uuid": "^9.0.0",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
