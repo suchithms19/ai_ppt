@@ -10,14 +10,14 @@ class AlaiWebSocketService {
 
   async createSlideVariants(presentationId, slideId, scrapedData) {
     return new Promise((resolve, reject) => {
-      console.log('Starting WebSocket connection for slide creation...');
+      console.log('🔌 Starting WebSocket connection for slide creation...');
       
       const ws = new WebSocket(this.wsUrl);
       const variants = [];
       let isConnectionClosed = false;
 
       ws.on('open', () => {
-        console.log('WebSocket connection established successfully');
+        console.log('✅ WebSocket connection established successfully');
         const message = {
           auth_token: process.env.ALAI_BEARER_TOKEN,
           presentation_id: presentationId,
@@ -29,7 +29,7 @@ class AlaiWebSocketService {
           update_tone_verbosity_calibration_status: true
         };
 
-        console.log('Sending initial request for slides...');
+        console.log('📤 Sending initial request for slides...');
         ws.send(JSON.stringify(message));
       });
 
@@ -40,25 +40,25 @@ class AlaiWebSocketService {
 
           // After receiving 5 variants, close the connection and resolve
           if (variants.length === 5) {
-            console.log('Received all 5 variants, closing connection...');
+            console.log('✨ Received all 5 variants, closing connection...');
             isConnectionClosed = true;
             ws.close();
             resolve(variants);
           }
         } catch (error) {
-          console.error('Error parsing WebSocket message:', error);
+          console.error('❌ Error parsing WebSocket message:', error);
         }
       });
 
       ws.on('error', (error) => {
-        console.error('WebSocket error:', error);
+        console.error('⚠️ WebSocket error:', error);
         if (!isConnectionClosed) {
           reject(error);
         }
       });
 
       ws.on('close', () => {
-        console.log(`Connection closed. Received ${variants.length} variants`);
+        console.log(`🔒 Connection closed. Received ${variants.length} variants`);
         if (!isConnectionClosed && variants.length < 5) {
           reject(new Error(`WebSocket connection closed before receiving all variants. Only received ${variants.length} variants`));
         }
@@ -67,7 +67,7 @@ class AlaiWebSocketService {
       // Set a timeout of 60 seconds
       setTimeout(() => {
         if (ws.readyState === WebSocket.OPEN && !isConnectionClosed) {
-          console.log('WebSocket timeout after 60 seconds');
+          console.log('⏰ WebSocket timeout after 60 seconds');
           ws.close();
           reject(new Error('WebSocket timeout after 60 seconds'));
         }

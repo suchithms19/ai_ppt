@@ -8,14 +8,14 @@ class AlaiService {
     this.presentationId = null;
     this.slideIds = [];  // Store all slide IDs
     this.baseUrl = 'https://alai-standalone-backend.getalai.com';
-    console.log('AlaiService initialized');
+    console.log('🚀 AlaiService initialized');
   }
 
   async createPresentation(title = "Alai Presentation") {
-    console.log(`Creating new presentation with title: "${title}"`);
+    console.log(`📝 Creating new presentation with title: "${title}"`);
     try {
       const newPresentationId = uuidv4();
-      console.log(`Creating new presentation`);
+      console.log(`🎯 Creating new presentation`);
       
       const response = await fetch(`${this.baseUrl}/create-new-presentation`, {
         method: 'POST',
@@ -53,7 +53,7 @@ class AlaiService {
         slideId: data.slide_id
       };
     } catch (error) {
-      console.error('Error creating presentation:', error);
+      console.error('❌ Error creating presentation:', error);
       throw error;
     }
   }
@@ -61,7 +61,7 @@ class AlaiService {
   async createNewSlide(slideOrder) {
     try {
       const newSlideId = uuidv4();
-      console.log(`Creating slide with order ${slideOrder}`);
+      console.log(`🎨 Creating slide with order ${slideOrder}`);
       
       const response = await fetch(`${this.baseUrl}/create-new-slide`, {
         method: 'POST',
@@ -86,7 +86,7 @@ class AlaiService {
       this.slideIds.push(newSlideId);
       return newSlideId;
     } catch (error) {
-      console.error('Error creating new slide:', error);
+      console.error('❌ Error creating new slide:', error);
       throw error;
     }
   }
