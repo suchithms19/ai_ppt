@@ -129,7 +129,6 @@ Please extract this information in a clear, organized manner that would be suita
         enableWebSearch: true
       });
 
-      console.log(scrapeResult.data)
 
       if (!scrapeResult.success) {
         throw new Error(`Failed to scrape: ${scrapeResult.error}`);

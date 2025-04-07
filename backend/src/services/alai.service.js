@@ -14,9 +14,7 @@ class AlaiService {
   async createPresentation(title = "Alai Presentation") {
     console.log(`📝 Creating new presentation with title: "${title}"`);
     try {
-      const newPresentationId = uuidv4();
-      console.log(`🎯 Creating new presentation`);
-      
+      const newPresentationId = uuidv4();      
       const response = await fetch(`${this.baseUrl}/create-new-presentation`, {
         method: 'POST',
         headers: {

@@ -41,27 +41,42 @@ app.post('/api/create-presentation', async (req, res) => {
     );
     console.log('✅ First slide variants generated');
 
-    // Step 4: Create and generate variants for additional slides
-    console.log(`\n📑 Step 4: Creating ${numberOfSlides - 1} additional slides...`);
-    for (let i = 0; i < numberOfSlides; i++) {
-      // Skip the first slide (order 0) as it's already created
-      if (i === 0) continue;
-
-      console.log(`\n🔄 Processing slide ${i + 1} of ${numberOfSlides}...`);
+    // Step 4: Create and generate variants for additional slides in parallel
+    if (numberOfSlides > 1) {
+      console.log(`\n📑 Step 4: Creating ${numberOfSlides - 1} additional slides in parallel...`);
       
-      // Create new slide
-      await alaiService.createNewSlide(i);
-      console.log(`✨ Slide ${i + 1} created`);
+      // Create an array of slide numbers to process (skip the first slide)
+      const slidePromises = [];
+      
+      for (let i = 1; i < numberOfSlides; i++) {
+        // Create a promise for each slide processing
+        const slidePromise = (async (slideNumber) => {
+          console.log(`\n🔄 Starting processing for slide ${slideNumber + 1}...`);
+          
+          // Create new slide
+          const newSlideId = await alaiService.createNewSlide(slideNumber);
+          console.log(`✨ Slide ${slideNumber + 1} created`);
 
-      // Generate variants for the new slide
-      await alaiWebSocketService.createSlideVariants(
-        alaiService.getPresentationId(),
-        alaiService.getLatestSlideId(),
-        scrapedData,
-        i,  // Current slide number
-        numberOfSlides
-      );
-      console.log(`✅ Variants for slide ${i + 1} generated`);
+          // Generate variants for the new slide
+          await alaiWebSocketService.createSlideVariants(
+            alaiService.getPresentationId(),
+            newSlideId,
+            scrapedData,
+            slideNumber,
+            numberOfSlides
+          );
+          console.log(`✅ Variants for slide ${slideNumber + 1} generated`);
+          
+          return { slideNumber, success: true };
+        })(i);
+        
+        slidePromises.push(slidePromise);
+      }
+      
+      // Wait for all slides to be processed in parallel
+      console.log(`\n⏳ Waiting for all ${numberOfSlides - 1} slides to complete...`);
+      const results = await Promise.all(slidePromises);
+      console.log(`\n🎯 All ${results.length} additional slides processed successfully`);
     }
 
     const finalUrl = `https://app.getalai.com/presentation/${alaiService.getPresentationId()}`;
