@@ -9,10 +9,12 @@ class AlaiWebSocketService {
   }
 
   async createSlideVariants(presentationId, slideId, scrapedData) {
-    console.log('Starting WebSocket connection for slide creation...');
     return new Promise((resolve, reject) => {
+      console.log('Starting WebSocket connection for slide creation...');
+      
       const ws = new WebSocket(this.wsUrl);
       const variants = [];
+      let isConnectionClosed = false;
 
       ws.on('open', () => {
         console.log('WebSocket connection established successfully');
@@ -35,11 +37,11 @@ class AlaiWebSocketService {
         try {
           const response = JSON.parse(data.toString());
           variants.push(response);
-          console.log(`Received variant ${variants.length} of 5`);
 
           // After receiving 5 variants, close the connection and resolve
           if (variants.length === 5) {
-            console.log('All 5 variants received successfully. Closing connection.');
+            console.log('Received all 5 variants, closing connection...');
+            isConnectionClosed = true;
             ws.close();
             resolve(variants);
           }
@@ -49,25 +51,27 @@ class AlaiWebSocketService {
       });
 
       ws.on('error', (error) => {
-        console.error('WebSocket connection error:', error);
-        reject(error);
+        console.error('WebSocket error:', error);
+        if (!isConnectionClosed) {
+          reject(error);
+        }
       });
 
       ws.on('close', () => {
-        if (variants.length < 5) {
-          console.error(`Connection closed prematurely. Only received ${variants.length} variants`);
-          reject(new Error('WebSocket connection closed before receiving all variants'));
+        console.log(`Connection closed. Received ${variants.length} variants`);
+        if (!isConnectionClosed && variants.length < 5) {
+          reject(new Error(`WebSocket connection closed before receiving all variants. Only received ${variants.length} variants`));
         }
       });
 
-      // Set a timeout of 30 seconds
+      // Set a timeout of 60 seconds
       setTimeout(() => {
-        if (ws.readyState === WebSocket.OPEN) {
-          console.error('Connection timed out after 30 seconds');
+        if (ws.readyState === WebSocket.OPEN && !isConnectionClosed) {
+          console.log('WebSocket timeout after 60 seconds');
           ws.close();
-          reject(new Error('WebSocket timeout after 30 seconds'));
+          reject(new Error('WebSocket timeout after 60 seconds'));
         }
-      }, 30000);
+      }, 60000);
     });
   }
 }

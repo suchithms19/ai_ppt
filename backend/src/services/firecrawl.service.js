@@ -20,7 +20,7 @@ class FirecrawlService {
       console.log('Initiating Firecrawl extraction...');
       const scrapeResult = await this.firecrawl.extract([url], {
         prompt: customPrompt || this.DEFAULT_PROMPT,
-        enableWebSearch: true
+        enableWebSearch: true,
       });
 
       if (!scrapeResult.success) {
