@@ -114,7 +114,7 @@ Please extract this information in a clear, organized manner that would be suita
    - Custom solutions
    - Payment terms
 
-Extract all relevant data points that would help create a compelling, data-driven presentation.`;
+Please extract this information in a clear, organized manner that would be suitable for creating an engaging presentation.`;
 
   async scrapeWebsite(url, customPrompt) {
     try {

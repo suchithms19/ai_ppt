@@ -35,7 +35,9 @@ app.post('/api/create-presentation', async (req, res) => {
     await alaiWebSocketService.createSlideVariants(
       alaiService.getPresentationId(),
       alaiService.getLatestSlideId(),
-      scrapedData
+      scrapedData,
+      0,  // First slide (number 0)
+      numberOfSlides
     );
     console.log('✅ First slide variants generated');
 
@@ -45,19 +47,21 @@ app.post('/api/create-presentation', async (req, res) => {
       // Skip the first slide (order 0) as it's already created
       if (i === 0) continue;
 
-      console.log(`\n🔄 Processing slide with order ${i} of ${numberOfSlides - 1}...`);
+      console.log(`\n🔄 Processing slide ${i + 1} of ${numberOfSlides}...`);
       
       // Create new slide
       await alaiService.createNewSlide(i);
-      console.log(`✨ Slide with order ${i} created`);
+      console.log(`✨ Slide ${i + 1} created`);
 
       // Generate variants for the new slide
       await alaiWebSocketService.createSlideVariants(
         alaiService.getPresentationId(),
         alaiService.getLatestSlideId(),
-        scrapedData
+        scrapedData,
+        i,  // Current slide number
+        numberOfSlides
       );
-      console.log(`✅ Variants for slide with order ${i} generated`);
+      console.log(`✅ Variants for slide ${i + 1} generated`);
     }
 
     const finalUrl = `https://app.getalai.com/presentation/${alaiService.getPresentationId()}`;
