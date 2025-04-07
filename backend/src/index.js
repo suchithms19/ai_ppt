@@ -13,7 +13,7 @@ app.use(express.json());
 
 app.post('/api/create-presentation', async (req, res) => {
   try {
-    const { url, prompt, presentationTitle, numberOfSlides = 3 } = req.body;
+    const { url, prompt, presentationTitle, numberOfSlides = 4 } = req.body;
 
     if (!url) {
       console.error('❌ Error: URL is required');

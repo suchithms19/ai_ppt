@@ -2,7 +2,6 @@
 
 This service automatically generates professional presentations from any website URL. It scrapes the website content and creates a multi-slide presentation using AI.
 
-
 ## 🛠️ Prerequisites
 
 - Node.js (v14 or higher)

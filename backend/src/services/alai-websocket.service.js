@@ -118,11 +118,11 @@ class AlaiWebSocketService {
 
       setTimeout(() => {
         if (ws.readyState === WebSocket.OPEN && !isConnectionClosed) {
-          console.log('⏰ WebSocket timeout after 60 seconds');
+          console.log('⏰ WebSocket timeout after 120 seconds');
           ws.close();
-          reject(new Error('WebSocket timeout after 60 seconds'));
+          reject(new Error('WebSocket timeout after 120 seconds'));
         }
-      }, 60000);
+      }, 120000);
     });
   }
 }
